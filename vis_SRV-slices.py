@@ -49,6 +49,71 @@ def main():
     ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
     reader = pvs.OpenDataFile(args.input)
 
+    #reader.UpdatePipelineInformation()
+    reader.UpdatePipeline()
+
+    bds= reader.GetDataInformation().GetBounds() # needs UpdatePipeline
+    print bds
+    
+    pvs.Delete(reader)
+    del reader
+
+    (minX, maxX, minY, maxY, minZ, maxZ) = [x for x in bds] 
+    center = map(lambda x,y : (x+y)/2, bds[0:6:2], bds[1:6:2]) #center
+
+    # ##center xy-slice
+    # p0= [0, 0, center[2]]
+    # p1= [0, maxY, center[2]]
+    # p2= [maxX, 0, center[2]]
+
+    ##center xz-slice
+    p0= [0, center[1], 0]
+    p1= [0, center[1], maxZ]
+    p2= [maxX, center[1], 0]
+
+    plane1 = pvs.Plane(guiName="xz-plane")
+    plane1.Origin= p0
+    plane1.Point1= p1
+    plane1.Point2= p2
+
+    ##center yz-slice
+    p0= [center[0], 0, 0]
+    p1= [center[0], 0, maxZ]
+    p2= [center[0], maxY, 0]
+
+    plane2 = pvs.Plane(guiName="yz-plane")
+    plane2.Origin= p0
+    plane2.Point1= p1
+    plane2.Point2= p2
+
+    plane= []
+    scale= 0.331662
+    z_list = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
+    for i, z in enumerate(z_list):
+        ##center xy-slice
+        p0= [0, 0,    z*scale]
+        p1= [0, maxY, z*scale]
+        p2= [maxX, 0, z*scale]
+
+        plane.append(pvs.Plane(guiName="xy-plane_%04d"%z))
+        plane[i].Origin= p0
+        plane[i].Point1= p1
+        plane[i].Point2= p2
+
+
+
+    # plane1Display = pvs.Show(plane1)
+    # #plane1Display.Texture = reader
+    # dp = pvs.GetDisplayProperties(plane1)
+    # dp.Representation = 'Surface With Edges'
+    # #dp.Texture = reader
+
+    ## make all sources visible
+    for px in pvs.GetSources().values():
+        pvs.Show(px)
+        dp= pvs.GetDisplayProperties(px)
+        dp.Representation = 'Surface'
+        dp.Opacity= 1.0
 
 
     if args.output:
