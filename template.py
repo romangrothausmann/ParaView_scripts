@@ -1,6 +1,9 @@
-#!/usr/bin/pvpython
+#!pvpython
 
-from paraview.simple import *
+## API: http://www.paraview.org/ParaView/Doc/Nightly/www/py-doc/index.html
+
+
+import paraview.simple as pvs
 
 
 def main():
@@ -38,12 +41,15 @@ def main():
        sys.exit(1)
 
     ## read pvsm
-    #servermanager.LoadState(args.input)
+    #pvs.servermanager.LoadState(args.input)
 
     ## read a vtp
-    reader = XMLPolyDataReader(FileName=args.input)
+    #reader = pvs.XMLPolyDataReader(FileName=args.input)
 
-    sph = Sphere()
+    ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
+    reader = pvs.OpenDataFile(args.input)
+
+
 
     if args.output:
         try:
@@ -57,7 +63,7 @@ def main():
             traceback.print_exc()
 
         if ok:
-            servermanager.SaveState(args.output)
+            pvs.servermanager.SaveState(args.output)
 
 
 
