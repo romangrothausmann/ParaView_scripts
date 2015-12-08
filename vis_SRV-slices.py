@@ -120,8 +120,12 @@ def main():
 
         dp= pvs.GetDisplayProperties(px)
         dp.Representation = 'Surface'
-        dp.Opacity= 1.0
         dp.Texture= texProxy 
+        if 'G' in guiName:
+            dp.Opacity= 1.0
+        else:
+            dp.Opacity= 0.5
+            
 
     # pvs.Render()
     # wait = input("PRESS ENTER TO CONTINUE.")
