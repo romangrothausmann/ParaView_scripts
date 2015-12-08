@@ -126,6 +126,20 @@ def main():
     # pvs.Render()
     # wait = input("PRESS ENTER TO CONTINUE.")
 
+    RenderView1 = pvs.GetRenderView()
+    RenderView1.ResetCamera()
+
+    RenderView1.LightSwitch= 1 # "Head Light"
+    RenderView1.UseLight= 1 #"Light Kit"
+    RenderView1.KeyLightIntensity= 1.0
+    RenderView1.FillLightKFRatio= 1.0
+    RenderView1.BackLightKBRatio= 1.0
+    RenderView1.HeadLightKHRatio= 6.5
+    #RenderView1.HeadLightWarmth= 0.5
+
+    # r = pvs.GetDisplayProperties()
+    # r.Ambient = 1.0
+
     if args.output:
         try:
             f = open(args.output, 'w')
