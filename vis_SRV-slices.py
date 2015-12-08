@@ -66,55 +66,65 @@ def main():
     # p1= [0, maxY, center[2]]
     # p2= [maxX, 0, center[2]]
 
-    ##center xz-slice
-    p0= [0, center[1], 0]
-    p1= [0, center[1], maxZ]
-    p2= [maxX, center[1], 0]
+    layerList= ['G', 'A', 'B']
+    for j, s in enumerate(layerList):
 
-    plane1 = pvs.Plane(guiName="xz-plane")
-    plane1.Origin= p0
-    plane1.Point1= p1
-    plane1.Point2= p2
+        ##center xz-slice
+        p0= [0, center[1], 0]
+        p1= [0, center[1], maxZ]
+        p2= [maxX, center[1], 0]
 
-    ##center yz-slice
-    p0= [center[0], 0, 0]
-    p1= [center[0], 0, maxZ]
-    p2= [center[0], maxY, 0]
+        plane1 = pvs.Plane(guiName="xz-plane_"+s)
+        plane1.Origin= p0
+        plane1.Point1= p1
+        plane1.Point2= p2
 
-    plane2 = pvs.Plane(guiName="yz-plane")
-    plane2.Origin= p0
-    plane2.Point1= p1
-    plane2.Point2= p2
+        ##center yz-slice
+        p0= [center[0], 0, 0]
+        p1= [center[0], 0, maxZ]
+        p2= [center[0], maxY, 0]
 
-    plane= []
-    scale= 0.331662
-    z_list = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
-    for i, z in enumerate(z_list):
-        ##center xy-slice
-        p0= [0, 0,    z*scale]
-        p1= [0, maxY, z*scale]
-        p2= [maxX, 0, z*scale]
+        plane2 = pvs.Plane(guiName="yz-plane_"+s)
+        plane2.Origin= p0
+        plane2.Point1= p1
+        plane2.Point2= p2
 
-        plane.append(pvs.Plane(guiName="xy-plane_%04d"%z))
-        plane[i].Origin= p0
-        plane[i].Point1= p1
-        plane[i].Point2= p2
+        plane= []
+        scale= 0.331662
+        z_list = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
+        for i, z in enumerate(z_list):
+            ##center xy-slice
+            p0= [0, 0,    z*scale]
+            p1= [0, maxY, z*scale]
+            p2= [maxX, 0, z*scale]
 
+            plane.append(pvs.Plane(guiName="xy-plane_%s%04d"%(s,z)))
+            plane[i].Origin= p0
+            plane[i].Point1= p1
+            plane[i].Point2= p2
 
-
-    # plane1Display = pvs.Show(plane1)
-    # #plane1Display.Texture = reader
-    # dp = pvs.GetDisplayProperties(plane1)
-    # dp.Representation = 'Surface With Edges'
-    # #dp.Texture = reader
 
     ## make all sources visible
     for px in pvs.GetSources().values():
         pvs.Show(px)
+
+        guiName= pvs.servermanager.ProxyManager().GetProxyName("sources", px)
+        fnPNG= guiName + ".png"
+        print fnPNG
+
+        ## http://www.paraview.org/pipermail/paraview/2012-March/024261.html
+        ## http://www.paraview.org/pipermail/paraview/2009-March/011544.html
+        texProxy = pvs.servermanager.CreateProxy("textures", "ImageTexture")
+        texProxy.GetProperty("FileName").SetElement(0, fnPNG)
+        texProxy.UpdateVTKObjects()
+
         dp= pvs.GetDisplayProperties(px)
         dp.Representation = 'Surface'
         dp.Opacity= 1.0
+        dp.Texture= texProxy 
 
+    # pvs.Render()
+    # wait = input("PRESS ENTER TO CONTINUE.")
 
     if args.output:
         try:
