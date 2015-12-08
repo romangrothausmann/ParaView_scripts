@@ -7,55 +7,19 @@ import paraview.simple as pvs
 
 def run(fn="extent.mha"):
 
-    ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    reader = pvs.OpenDataFile(fn)
-    reader.UpdatePipeline()
-
-    bds= reader.GetDataInformation().GetBounds() # needs UpdatePipeline
-    print bds
-    
-    pvs.Delete(reader)
-    del reader
-
-    (minX, maxX, minY, maxY, minZ, maxZ) = [x for x in bds] 
-    center = map(lambda x,y : (x+y)/2, bds[0:6:2], bds[1:6:2]) #center
 
     layerList= ['G', 'A', 'B']
     for j, s in enumerate(layerList):
 
-        ##center yz-slice, x-normal
-        p0= [0, center[1], 0]
-        p1= [0, center[1], maxZ]
-        p2= [maxX, center[1], 0]
-
-        plane1 = pvs.Plane(guiName="yz-plane_"+s)
-        plane1.Origin= p0
-        plane1.Point1= p1
-        plane1.Point2= p2
-
-        ##center xz-slice, y-normal
-        p0= [center[0], 0, 0]
-        p1= [center[0], 0, maxZ]
-        p2= [center[0], maxY, 0]
-
-        plane2 = pvs.Plane(guiName="xz-plane_"+s)
-        plane2.Origin= p0
-        plane2.Point1= p1
-        plane2.Point2= p2
+        reader1 = pvs.OpenDataFile("yz-plane.vtp", guiName="yz-plane_"+s)
+        reader2 = pvs.OpenDataFile("xz-plane.vtp", guiName="xz-plane_"+s)
 
         plane= []
         scale= 0.331662
         zList = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
+        #zList = [129, 640, 1131, 2692, 3250, 4046]
         for i, z in enumerate(zList):
-            ##center xy-slice
-            p0= [0, 0,    z*scale]
-            p1= [0, maxY, z*scale]
-            p2= [maxX, 0, z*scale]
-
-            plane.append(pvs.Plane(guiName="xy-plane_%s%04d"%(s,z)))
-            plane[i].Origin= p0
-            plane[i].Point1= p1
-            plane[i].Point2= p2
+            plane.append(pvs.OpenDataFile("xy-plane_%04d.vtp"%(z), guiName="xy-plane_%s%04d"%(s,z)))
 
 
     ## make all sources visible
@@ -73,6 +37,8 @@ def run(fn="extent.mha"):
         texProxy.UpdateVTKObjects()
 
         dp= pvs.GetDisplayProperties(px)
+        #pvs.ColorBy(rep=dp, value=None) #solid color, does not work
+        dp.ColorArrayName = [None, ''] #solid color, works
         dp.Representation = 'Surface'
         dp.Texture= texProxy 
         if 'G' in guiName:
@@ -114,7 +80,6 @@ def main():
 
     parser = argparse.ArgumentParser(description=usage_text)
 
-    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
     parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
 
     args = parser.parse_args(argv)
@@ -123,17 +88,12 @@ def main():
         parser.print_help()
         return
 
-    if not args.input:
-       print('Need an input file')
-       parser.print_help()
-       sys.exit(1)
-
     if not args.output:
        print('Need an output file')
        parser.print_help()
        sys.exit(1)
 
-    run(args.input)
+    run()
 
     if args.output:
         try:
