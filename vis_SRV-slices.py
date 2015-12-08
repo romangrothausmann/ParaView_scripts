@@ -69,22 +69,22 @@ def main():
     layerList= ['G', 'A', 'B']
     for j, s in enumerate(layerList):
 
-        ##center xz-slice
+        ##center yz-slice, x-normal
         p0= [0, center[1], 0]
         p1= [0, center[1], maxZ]
         p2= [maxX, center[1], 0]
 
-        plane1 = pvs.Plane(guiName="xz-plane_"+s)
+        plane1 = pvs.Plane(guiName="yz-plane_"+s)
         plane1.Origin= p0
         plane1.Point1= p1
         plane1.Point2= p2
 
-        ##center yz-slice
+        ##center xz-slice, y-normal
         p0= [center[0], 0, 0]
         p1= [center[0], 0, maxZ]
         p2= [center[0], maxY, 0]
 
-        plane2 = pvs.Plane(guiName="yz-plane_"+s)
+        plane2 = pvs.Plane(guiName="xz-plane_"+s)
         plane2.Origin= p0
         plane2.Point1= p1
         plane2.Point2= p2
@@ -124,7 +124,7 @@ def main():
         if 'G' in guiName:
             dp.Opacity= 1.0
         else:
-            dp.Opacity= 0.5
+            dp.Opacity= 0.95 # color gradient not visible below .95
             
 
     # pvs.Render()
