@@ -5,51 +5,10 @@
 
 import paraview.simple as pvs
 
-
-def main():
-    import sys       # to get command line args
-    import argparse  # to parse options for us and print a nice help message
-
-    argv = sys.argv
-
-    if __file__ in argv:
-        argv = argv[argv.index(__file__) + 1:]  # get all args after __file__
-
-
-    usage_text =  "Run ParaView in background mode with this script:"
-    usage_text += "  pvpython " + __file__ + " [options]"
-
-    parser = argparse.ArgumentParser(description=usage_text)
-
-    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
-    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
-
-    args = parser.parse_args(argv)
-
-    if not argv:
-        parser.print_help()
-        return
-
-    if not args.input:
-       print('Need an input file')
-       parser.print_help()
-       sys.exit(1)
-
-    if not args.output:
-       print('Need an output file')
-       parser.print_help()
-       sys.exit(1)
-
-    ## read pvsm
-    #pvs.servermanager.LoadState(args.input)
-
-    ## read a vtp
-    #reader = pvs.XMLPolyDataReader(FileName=args.input)
+def run(fn="extent.mha"):
 
     ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    reader = pvs.OpenDataFile(args.input)
-
-    #reader.UpdatePipelineInformation()
+    reader = pvs.OpenDataFile(fn)
     reader.UpdatePipeline()
 
     bds= reader.GetDataInformation().GetBounds() # needs UpdatePipeline
@@ -60,11 +19,6 @@ def main():
 
     (minX, maxX, minY, maxY, minZ, maxZ) = [x for x in bds] 
     center = map(lambda x,y : (x+y)/2, bds[0:6:2], bds[1:6:2]) #center
-
-    # ##center xy-slice
-    # p0= [0, 0, center[2]]
-    # p1= [0, maxY, center[2]]
-    # p2= [maxX, 0, center[2]]
 
     layerList= ['G', 'A', 'B']
     for j, s in enumerate(layerList):
@@ -91,8 +45,8 @@ def main():
 
         plane= []
         scale= 0.331662
-        z_list = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
-        for i, z in enumerate(z_list):
+        zList = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
+        for i, z in enumerate(zList):
             ##center xy-slice
             p0= [0, 0,    z*scale]
             p1= [0, maxY, z*scale]
@@ -144,6 +98,43 @@ def main():
     # r = pvs.GetDisplayProperties()
     # r.Ambient = 1.0
 
+
+def main():
+    import sys       # to get command line args
+    import argparse  # to parse options for us and print a nice help message
+
+    argv = sys.argv
+
+    if __file__ in argv:
+        argv = argv[argv.index(__file__) + 1:]  # get all args after __file__
+
+
+    usage_text =  "Run ParaView in background mode with this script:"
+    usage_text += "  pvpython " + __file__ + " [options]"
+
+    parser = argparse.ArgumentParser(description=usage_text)
+
+    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
+    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
+
+    args = parser.parse_args(argv)
+
+    if not argv:
+        parser.print_help()
+        return
+
+    if not args.input:
+       print('Need an input file')
+       parser.print_help()
+       sys.exit(1)
+
+    if not args.output:
+       print('Need an output file')
+       parser.print_help()
+       sys.exit(1)
+
+    run(args.input)
+
     if args.output:
         try:
             f = open(args.output, 'w')
@@ -164,4 +155,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    run() # run with default parameters, e.g. as a macro run from GUI
 
