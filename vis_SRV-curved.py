@@ -54,6 +54,7 @@ def run(fn="extent.mha", GUI= False):
     #     RenderView1 = pvs.CreateRenderView()
     RenderView1 = pvs.GetRenderView()
     RenderView1.ResetCamera()
+    pvs.Render() #resets cam, without no OrientationAxes in ss
 
     RenderView1.LightSwitch= 1 # "Head Light"
     RenderView1.UseLight= 1 #"Light Kit"
@@ -76,6 +77,9 @@ def run(fn="extent.mha", GUI= False):
 
     ##set the background color
     RenderView1.Background = [1,1,1]  #white
+
+    RenderView1.OrientationAxesVisibility= 1
+    # RenderView1.CenterAxesVisibility= 1
 
     if GUI:
         pvs.Show()
