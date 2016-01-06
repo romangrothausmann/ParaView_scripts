@@ -5,7 +5,7 @@
 
 import paraview.simple as pvs
 
-def run(fn="extent.mha"):
+def run(fn="extent.mha", GUI= False):
 
     ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
     reader = pvs.OpenDataFile(fn)
@@ -81,9 +81,11 @@ def run(fn="extent.mha"):
             dp.Opacity= 0.95 # color gradient not visible below .95
             
 
-    # pvs.Render()
-    # wait = input("PRESS ENTER TO CONTINUE.")
-
+    ## even works with pvpython and no CreateRenderView, from http://www.paraview.org/Wiki/Take_a_Screenshot_of_a_VTP_File
+    # RenderView1 = pvs.GetActiveView()
+    # if not RenderView1:
+    #     # When using the ParaView UI, the View will be present, not otherwise.
+    #     RenderView1 = pvs.CreateRenderView()
     RenderView1 = pvs.GetRenderView()
     RenderView1.ResetCamera()
 
@@ -95,8 +97,25 @@ def run(fn="extent.mha"):
     RenderView1.HeadLightKHRatio= 6.5
     #RenderView1.HeadLightWarmth= 0.5
 
-    # r = pvs.GetDisplayProperties()
-    # r.Ambient = 1.0
+    ## position camera
+    ## read a pvcc: http://www.paraview.org/pipermail/paraview/2014-February/030490.html
+    RenderView1.CameraPosition= [667, 1591, 718]
+    RenderView1.CameraFocalPoint= [-295, -1053, 718]
+    RenderView1.CameraViewUp= [0.939692620785909, -0.342020143325669, 2.22044604925031e-16]
+    RenderView1.CameraViewAngle= 30
+    RenderView1.CenterOfRotation= [82, 82, 718]
+    RenderView1.RotationFactor= 1
+    RenderView1.CameraParallelScale= 728
+    RenderView1.CameraParallelProjection= 0
+
+    ##set the background color
+    RenderView1.Background = [1,1,1]  #white
+
+    if GUI:
+        pvs.Show()
+        pvs.Render() #resets cam outside GUI, only needed for GUI
+    else:
+        RenderView1.ViewSize = [1920, 900] #image size for ss
 
 
 def main():
@@ -114,24 +133,15 @@ def main():
 
     parser = argparse.ArgumentParser(description=usage_text)
 
-    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
-    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
+    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=False, default="extent.mha",  help="Input path contained in a text file.")
+    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=False, help="Output file to save the ParaView state in (*.pvsm)")
+    parser.add_argument("-s", "--screen-shot", dest="ss", metavar='FILE', required=False, help="Output file to save a screen-shot in (*.png)")
 
     args = parser.parse_args(argv)
 
     if not argv:
         parser.print_help()
         return
-
-    if not args.input:
-       print('Need an input file')
-       parser.print_help()
-       sys.exit(1)
-
-    if not args.output:
-       print('Need an output file')
-       parser.print_help()
-       sys.exit(1)
 
     run(args.input)
 
@@ -150,11 +160,14 @@ def main():
             pvs.servermanager.SaveState(args.output)
 
 
+    if args.ss:
+        #save screenshot
+        pvs.WriteImage(args.ss)
 
 
 
 if __name__ == "__main__":
     main()
 else:
-    run() # run with default parameters, e.g. as a macro run from GUI
+    run(GUI= True) # run with default parameters, e.g. as a macro run from GUI
 
