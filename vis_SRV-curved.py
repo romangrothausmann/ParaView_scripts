@@ -11,15 +11,15 @@ def run(fn="extent.mha"):
     layerList= ['G', 'A', 'B']
     for j, s in enumerate(layerList):
 
-        reader1 = pvs.OpenDataFile("yz-plane.vtp", guiName="yz-plane_"+s)
-        reader2 = pvs.OpenDataFile("xz-plane.vtp", guiName="xz-plane_"+s)
+        reader1 = pvs.OpenDataFile("yz-plane.vtp", guiName="plane-"+s+"_x@0250")
+        reader2 = pvs.OpenDataFile("xz-plane.vtp", guiName="plane-"+s+"_y@0250")
 
         plane= []
         scale= 0.331662
         zList = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
         #zList = [129, 640, 1131, 2692, 3250, 4046]
         for i, z in enumerate(zList):
-            plane.append(pvs.OpenDataFile("xy-plane_%04d.vtp"%(z), guiName="xy-plane_%s%04d"%(s,z)))
+            plane.append(pvs.OpenDataFile("xy-plane_%04d.vtp"%(z), guiName="plane-%s_z@%04d"%(s,z)))
 
 
     ## make all sources visible

@@ -28,7 +28,7 @@ def run(fn="extent.mha"):
         p1= [0, center[1], maxZ]
         p2= [maxX, center[1], 0]
 
-        plane1 = pvs.Plane(guiName="yz-plane_"+s)
+        plane1 = pvs.Plane(guiName="plane-"+s+"_x@0250")
         plane1.Origin= p0
         plane1.Point1= p1
         plane1.Point2= p2
@@ -38,7 +38,7 @@ def run(fn="extent.mha"):
         p1= [center[0], 0, maxZ]
         p2= [center[0], maxY, 0]
 
-        plane2 = pvs.Plane(guiName="xz-plane_"+s)
+        plane2 = pvs.Plane(guiName="plane-"+s+"_y@0250")
         plane2.Origin= p0
         plane2.Point1= p1
         plane2.Point2= p2
@@ -52,7 +52,7 @@ def run(fn="extent.mha"):
             p1= [0, maxY, z*scale]
             p2= [maxX, 0, z*scale]
 
-            plane.append(pvs.Plane(guiName="xy-plane_%s%04d"%(s,z)))
+            plane.append(pvs.Plane(guiName="plane-%s_z@%04d"%(s,z)))
             plane[i].Origin= p0
             plane[i].Point1= p1
             plane[i].Point2= p2
