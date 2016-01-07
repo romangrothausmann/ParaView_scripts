@@ -112,7 +112,7 @@ def run(fn="extent.mha", GUI= False):
     ##set the background color
     RenderView1.Background = [1,1,1]  #white
 
-    RenderView1.OrientationAxesVisibility= 1
+    RenderView1.OrientationAxesVisibility= 0
     # RenderView1.CenterAxesVisibility= 1
 
     if GUI:
@@ -139,7 +139,7 @@ def main():
 
     parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=False, default="extent.mha",  help="Input path contained in a text file.")
     parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=False, help="Output file to save the ParaView state in (*.pvsm)")
-    parser.add_argument("-s", "--screen-shot", dest="ss", metavar='FILE', required=False, help="Output file to save a screen-shot in (*.png)")
+    parser.add_argument("-s", "--screen-shot", dest="ss", metavar='FILE', required=False, help="Output base name to save a screen-shot in")
 
     args = parser.parse_args(argv)
 
@@ -166,7 +166,17 @@ def main():
 
     if args.ss:
         #save screenshot
-        pvs.WriteImage(args.ss)
+        pvs.WriteImage(args.ss+".png")
+
+        RenderView1 = pvs.GetRenderView()
+        pvs.ExportView(args.ss+".svg", view= RenderView1, Drawbackground= 0, Rasterize3Dgeometry= 1)
+
+        ## save OrientationAxes only for separate positioning in SVG
+        for px in pvs.GetSources().values():
+            pvs.Hide(px)
+
+        RenderView1.OrientationAxesVisibility= 1
+        pvs.WriteImage(args.ss+"_ori-axes.png")
 
 
 
