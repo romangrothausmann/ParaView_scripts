@@ -71,7 +71,7 @@ def run(fn="extent.mha", GUI= False):
         texProxy = pvs.servermanager.CreateProxy("textures", "ImageTexture")
         texProxy.GetProperty("FileName").SetElement(0, fnPNG)
         texProxy.UpdateVTKObjects()
-        pvs.servermanager.Register(texProxy)# essential to save tex in pvsm
+        pvs.servermanager.Register(texProxy, registrationName= fnPNG) # essential to save tex in pvsm
 
         dp= pvs.GetDisplayProperties(px)
         dp.Representation = 'Surface'
