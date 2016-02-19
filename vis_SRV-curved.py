@@ -15,7 +15,6 @@ def run(fn="extent.mha", GUI= False):
         reader2 = pvs.OpenDataFile("xz-plane.vtp", guiName="plane-"+s+"_y@0250")
 
         plane= []
-        scale= 0.331662
         zList = [129, 640, 1131, 1533, 1601, 1773, 2156, 2190, 2389, 2497, 2578, 2692, 2945, 3041, 3250, 4046]
         #zList = [129, 640, 1131, 2692, 3250, 4046]
         for i, z in enumerate(zList):

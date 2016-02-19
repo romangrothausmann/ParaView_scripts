@@ -22,7 +22,8 @@ def main():
     parser = argparse.ArgumentParser(description=usage_text)
 
     parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
-    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
+    parser.add_argument("-png", "--png", dest="png", metavar='FILE', required=False, help="Output name to save a PNG screen-shot in")
+    parser.add_argument("-svg", "--svg", dest="svg", metavar='FILE', required=False, help="Output name to save a SVG screen-shot in")
 
     args = parser.parse_args(argv)
 
@@ -35,38 +36,40 @@ def main():
        parser.print_help()
        sys.exit(1)
 
-    if not args.output:
+    if not args.png and not args.svg:
        print('Need an output file')
        parser.print_help()
        sys.exit(1)
 
     ## read pvsm
-    #pvs.servermanager.LoadState(args.input)
+    pvs.servermanager.LoadState(args.input)
 
-    ## read a vtp
-    #reader = pvs.XMLPolyDataReader(FileName=args.input)
+    ## make all sources visible
+    for px in pvs.GetSources().values():
+        pvs.Show(px) # apparently essential
 
-    ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    reader = pvs.OpenDataFile(args.input)
+    rv= pvs.GetRenderView()#
+    rv.ResetCamera()
+    rv.ViewSize = [1920, 900] #image size for ss
+    
+    pvs.Render() #resets cam, without no OrientationAxes in ss
+    
+    rv.OrientationAxesVisibility= 0
+    # rv.CenterAxesVisibility= 1
+    
+    if args.png:
+        pvs.WriteImage(args.png)
 
+        
+    if args.svg:
+        pvs.ExportView(args.svg, view= rv, Drawbackground= 0, Rasterize3Dgeometry= 1)
 
+        ## save OrientationAxes only for separate positioning in SVG
+        for px in pvs.GetSources().values():
+            pvs.Hide(px)
 
-    if args.output:
-        try:
-            f = open(args.output, 'w')
-            f.close()
-            ok = True
-        except:
-            print("Cannot save to path %r" % save_path)
-
-            import traceback
-            traceback.print_exc()
-
-        if ok:
-            pvs.servermanager.SaveState(args.output)
-
-
-
+        rv.OrientationAxesVisibility= 1
+        pvs.WriteImage(args.svg+".ori-axes.png")
 
 
 if __name__ == "__main__":
