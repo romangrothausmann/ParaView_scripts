@@ -44,18 +44,27 @@ def main():
     ## read pvsm
     pvs.servermanager.LoadState(args.input)
 
-    ## make all sources visible
-    for px in pvs.GetSources().values():
-        pvs.Show(px) # apparently essential
+    rv= pvs.CreateRenderView()
 
-    rv= pvs.GetRenderView()#
-    rv.ResetCamera()
+    for px in pvs.GetSources().values():
+        dp= pvs.GetDisplayProperties(px)
+        print dp.Representation
+        if dp.Representation == 'Outline':
+            dp.Representation= 'Volume'
+            print dp.Representation, dp.VolumeRenderingMode
+            dp.VolumeRenderingMode= 'Ray Cast Only'
+            otf = pvs.GetOpacityTransferFunction(pvs.servermanager.ProxyManager().GetProxyName("sources", px))
+            otf.Points= [0.0, 0.0, 0.5, 0.0, 5.48407649993896, 0.0, 0.5, 0.0, 14.8853511810303, 0.085526317358017, 0.5, 0.0, 119.866249084473, 0.0263157896697521, 0.5, 0.0, 137.101913452148, 0.0, 0.5, 0.0, 246.0, 0.0, 0.5, 0.0]
+            otf.AllowDuplicateScalars= 1
+            otf.ScalarRangeInitialized= 1
+
+
     rv.ViewSize = [1920, 900] #image size for ss
-    
-    pvs.Render() #resets cam, without no OrientationAxes in ss
-    
     rv.OrientationAxesVisibility= 0
     # rv.CenterAxesVisibility= 1
+   
+    pvs.Render() #resets cam, without no OrientationAxes in ss
+    
     
     if args.png:
         pvs.WriteImage(args.png)
