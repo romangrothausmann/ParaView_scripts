@@ -4,6 +4,7 @@
 
 
 import paraview.simple as pvs
+import os
 
 
 def main():
@@ -26,6 +27,7 @@ def main():
     parser.add_argument("-svg", "--svg", dest="svg", metavar='FILE', required=False, help="Output name to save a SVG screen-shot in")
     parser.add_argument("-s", "--size", dest="size", type=int, required=False, help="desired size of screen-shot", nargs=2)
     parser.add_argument("-hq", "--highQVRender", dest="HQvr", default=False, action='store_true', required=False, help="Use high quality for volume rendering.")
+    parser.add_argument("-st", "--stereo", dest="stereo", default=False, action='store_true', required=False, help="Render a pair of stereo images.")
 
     args = parser.parse_args(argv)
 
@@ -70,11 +72,25 @@ def main():
     
     
     if args.png:
-        pvs.WriteImage(args.png)
+        if args.stereo: # https://cmake.org/pipermail/paraview/2011-June/022012.html
+            rv.StereoRender= 1
+            rv.StereoType= "Left"
+            pvs.WriteImage(os.path.splitext(args.png)[0]+"_LE"+os.path.splitext(args.png)[1])
+            rv.StereoType= "Right"
+            pvs.WriteImage(os.path.splitext(args.png)[0]+"_RE"+os.path.splitext(args.png)[1])
+        else:
+            pvs.WriteImage(args.png)
 
         
     if args.svg:
-        pvs.ExportView(args.svg, view= rv, Drawbackground= 0, Rasterize3Dgeometry= 1)
+        if args.stereo: # not working for SVGs with PV-4.4.0
+            rv.StereoRender= 1
+            rv.StereoType= "Left"
+            pvs.ExportView(os.path.splitext(args.svg)[0]+"_LE"+os.path.splitext(args.svg)[1], view= rv, Drawbackground= 0, Rasterize3Dgeometry= 1)
+            rv.StereoType= "Right"
+            pvs.ExportView(os.path.splitext(args.svg)[0]+"_RE"+os.path.splitext(args.svg)[1], view= rv, Drawbackground= 0, Rasterize3Dgeometry= 1)
+        else:
+            pvs.ExportView(args.svg, view= rv, Drawbackground= 0, Rasterize3Dgeometry= 1)
 
         ## save OrientationAxes only for separate positioning in SVG
         for px in pvs.GetSources().values():
