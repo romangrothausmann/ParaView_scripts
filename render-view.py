@@ -42,9 +42,9 @@ def main():
        sys.exit(1)
 
     ## read pvsm
-    pvs.servermanager.LoadState(args.input)
+    pvs.LoadState(args.input)
 
-    rv= pvs.CreateRenderView()
+    rv= pvs.GetRenderView()
 
     for px in pvs.GetSources().values():
         dp= pvs.GetDisplayProperties(px)
