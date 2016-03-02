@@ -24,6 +24,8 @@ def main():
     parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
     parser.add_argument("-png", "--png", dest="png", metavar='FILE', required=False, help="Output name to save a PNG screen-shot in")
     parser.add_argument("-svg", "--svg", dest="svg", metavar='FILE', required=False, help="Output name to save a SVG screen-shot in")
+    parser.add_argument("-s", "--size", dest="size", type=int, required=False, help="desired size of screen-shot", nargs=2)
+    parser.add_argument("-hq", "--highQVRender", dest="HQvr", default=False, action='store_true', required=False, help="Use high quality for volume rendering.")
 
     args = parser.parse_args(argv)
 
@@ -41,6 +43,9 @@ def main():
        parser.print_help()
        sys.exit(1)
 
+
+    print pvs.GetParaViewSourceVersion() # should create a ProxyManager, still getting the warning: ProxyManager is not set. Can not perform operation: Begin()
+
     ## read pvsm
     pvs.LoadState(args.input)
 
@@ -48,22 +53,20 @@ def main():
 
     for px in pvs.GetSources().values():
         dp= pvs.GetDisplayProperties(px)
-        print dp.Representation
-        if dp.Representation == 'Outline':
-            dp.Representation= 'Volume'
-            print dp.Representation, dp.VolumeRenderingMode
-            dp.VolumeRenderingMode= 'Ray Cast Only'
-            otf = pvs.GetOpacityTransferFunction(pvs.servermanager.ProxyManager().GetProxyName("sources", px))
-            otf.Points= [0.0, 0.0, 0.5, 0.0, 5.48407649993896, 0.0, 0.5, 0.0, 14.8853511810303, 0.085526317358017, 0.5, 0.0, 119.866249084473, 0.0263157896697521, 0.5, 0.0, 137.101913452148, 0.0, 0.5, 0.0, 246.0, 0.0, 0.5, 0.0]
-            otf.AllowDuplicateScalars= 1
-            otf.ScalarRangeInitialized= 1
+        if args.HQvr:
+            if dp.Representation == 'Volume':
+                print dp.Representation, dp.VolumeRenderingMode
+                dp.VolumeRenderingMode= 'Ray Cast Only'
+                print dp.Representation, dp.VolumeRenderingMode
 
 
-    rv.ViewSize = [1920, 900] #image size for ss
+    if args.size:
+        rv.ViewSize= args.size #image size for ss
+
+
     rv.OrientationAxesVisibility= 0
-    # rv.CenterAxesVisibility= 1
    
-    pvs.Render() #resets cam, without no OrientationAxes in ss
+    #pvs.Render() #resets cam orientation!
     
     
     if args.png:
