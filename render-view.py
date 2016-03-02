@@ -28,6 +28,7 @@ def main():
     parser.add_argument("-s", "--size", dest="size", type=int, required=False, help="desired size of screen-shot", nargs=2)
     parser.add_argument("-hq", "--highQVRender", dest="HQvr", default=False, action='store_true', required=False, help="Use high quality for volume rendering.")
     parser.add_argument("-st", "--stereo", dest="stereo", default=False, action='store_true', required=False, help="Render a pair of stereo images.")
+    parser.add_argument("-oa", "--oriAxes", dest="oriAxes", default=False, action='store_true', required=False, help="Render the orientation axes.")
 
     args = parser.parse_args(argv)
 
@@ -66,9 +67,13 @@ def main():
         rv.ViewSize= args.size #image size for ss
 
 
-    rv.OrientationAxesVisibility= 0
-   
-    #pvs.Render() #resets cam orientation!
+    if args.oriAxes:
+        rv.OrientationAxesVisibility= 1
+    else:
+        rv.OrientationAxesVisibility= 0
+
+    #pvs.Render() # calls rv.ResetCamera(), instead:
+    rv.MakeRenderWindowInteractor(True) # makes ori-axes visible
     
     
     if args.png:
