@@ -29,6 +29,7 @@ def main():
     parser.add_argument("-hq", "--highQVRender", dest="HQvr", default=False, action='store_true', required=False, help="Use high quality for volume rendering.")
     parser.add_argument("-st", "--stereo", dest="stereo", default=False, action='store_true', required=False, help="Render a pair of stereo images.")
     parser.add_argument("-oa", "--oriAxes", dest="oriAxes", default=False, action='store_true', required=False, help="Render the orientation axes.")
+    parser.add_argument("-oao", "--oriAxesOnly", dest="oriAxesOnly", default=False, action='store_true', required=False, help="Render only the orientation axes.")
 
     args = parser.parse_args(argv)
 
@@ -56,6 +57,8 @@ def main():
 
     for px in pvs.GetSources().values():
         dp= pvs.GetDisplayProperties(px)
+        if args.oriAxesOnly:
+            pvs.Hide(px)
         if args.HQvr:
             if dp.Representation == 'Volume':
                 print dp.Representation, dp.VolumeRenderingMode
@@ -67,7 +70,7 @@ def main():
         rv.ViewSize= args.size #image size for ss
 
 
-    if args.oriAxes:
+    if args.oriAxes or args.oriAxesOnly:
         rv.OrientationAxesVisibility= 1
     else:
         rv.OrientationAxesVisibility= 0
