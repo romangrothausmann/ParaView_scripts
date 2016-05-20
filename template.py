@@ -41,13 +41,13 @@ def main():
        sys.exit(1)
 
     ## read pvsm
-    #pvs.servermanager.LoadState(args.input)
+    pvs.LoadState(args.input)
 
     ## read a vtp
     #reader = pvs.XMLPolyDataReader(FileName=args.input)
 
     ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    reader = pvs.OpenDataFile(args.input)
+    #reader = pvs.OpenDataFile(args.input)
 
 
 

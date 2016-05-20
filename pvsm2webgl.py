@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description=usage_text)
 
     parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
-    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
+    parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output name to export WebGL")
 
     args = parser.parse_args(argv)
 
@@ -41,32 +41,16 @@ def main():
        sys.exit(1)
 
     ## read pvsm
-    #pvs.servermanager.LoadState(args.input)
+    pvs.LoadState(args.input)
 
-    ## read a vtp
-    #reader = pvs.XMLPolyDataReader(FileName=args.input)
+    rv= pvs.GetRenderView()
 
-    ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    reader = pvs.OpenDataFile(args.input)
-
-
-
-    if args.output:
-        try:
-            f = open(args.output, 'w')
-            f.close()
-            ok = True
-        except:
-            print("Cannot save to path %r" % save_path)
-
-            import traceback
-            traceback.print_exc()
-
-        if ok:
-            pvs.servermanager.SaveState(args.output)
-
-
-
+    exporters= pvs.servermanager.createModule("exporters")
+    # dir(exporters) # lists export modules: CSVExporter, CinemaExporter, GL2PSContextViewExporterBase, GL2PSContextViewExporterEPS, GL2PSContextViewExporterPDF, GL2PSContextViewExporterPS, GL2PSContextViewExporterSVG, GL2PSExporterBase, GL2PSRenderViewExporterBase, GL2PSRenderViewExporterEPS, GL2PSRenderViewExporterPDF, GL2PSRenderViewExporterPS, GL2PSRenderViewExporterSVG, POVExporter, VRMLExporter, WebGLExporter, X3DExporter, X3DExporterBinary
+    
+    exporter= exporters.WebGLExporter(FileName=args.output)
+    exporter.SetView(rv)
+    exporter.Write()
 
 
 if __name__ == "__main__":
