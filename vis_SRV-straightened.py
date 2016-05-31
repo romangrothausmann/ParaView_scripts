@@ -170,7 +170,7 @@ def main():
         pvs.WriteImage(args.ss+".png")
 
         RenderView1 = pvs.GetRenderView()
-        pvs.ExportView(args.ss+".svg", view= RenderView1, Drawbackground= 0, Rasterize3Dgeometry= 1)
+        #pvs.ExportView(args.ss+".svg", view= RenderView1, Drawbackground= 0, Rasterize3Dgeometry= 1)
 
         ## save OrientationAxes only for separate positioning in SVG
         for px in pvs.GetSources().values():
