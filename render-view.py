@@ -31,6 +31,7 @@ def main():
     parser.add_argument("-RE", "--rightEye", dest="RE", default=False, action='store_true', required=False, help="Render right eye for a pair of stereo images.")
     parser.add_argument("-oa", "--oriAxes", dest="oriAxes", default=False, action='store_true', required=False, help="Render the orientation axes.")
     parser.add_argument("-oao", "--oriAxesOnly", dest="oriAxesOnly", default=False, action='store_true', required=False, help="Render only the orientation axes.")
+    parser.add_argument("-r", "--resetCam", dest="reset", default=False, action='store_true', required=False, help="Reset render camera (\"view-all\")")
 
     args = parser.parse_args(argv)
 
@@ -86,6 +87,8 @@ def main():
         if args.RE:
             rv.StereoType= "Right"
 
+    if args.reset:
+        rv.ResetCamera()
     rv.UseOffscreenRendering= 1 # needed for stable checksums???
     rv.StillRender() # needed for StereoRender to take effect (at least for hq)!
 
