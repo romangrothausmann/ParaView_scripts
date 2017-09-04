@@ -21,7 +21,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=usage_text)
 
-    parser.add_argument("-i", "--input", dest="input", metavar='FILE', required=True, help="Input path contained in a text file.")
+    parser.add_argument("-i", "--input", dest="input", metavar='FILE', nargs='+', required=True, help="Input PVSMs to combine.")
     parser.add_argument("-o", "--output", dest="output", metavar='FILE', required=True, help="Output file to save the ParaView state in (*.pvsm)")
 
     args = parser.parse_args(argv)
@@ -41,14 +41,8 @@ def main():
        sys.exit(1)
 
     ## read pvsm
-    pvs.LoadState(args.input)
-
-    ## read a vtp
-    #reader = pvs.XMLPolyDataReader(FileName=args.input)
-
-    ## read a MetaImage (there is a MetaImageWriter but no MetaImageReader)
-    #reader = pvs.OpenDataFile(args.input)
-
+    for f in args.input:
+        pvs.LoadState(f)
 
 
     if args.output:
