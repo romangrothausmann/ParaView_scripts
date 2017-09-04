@@ -1,0 +1,2 @@
+## build in pattern https://git-scm.com/docs/gitattributes/#_defining_a_custom_hunk_header
+*.py      diff=python
