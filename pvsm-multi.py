@@ -40,9 +40,25 @@ def main():
        parser.print_help()
        sys.exit(1)
 
-    ## read pvsm
+
+    reppro= [] # list to store property-list for each object
+    oldreprs= []
+
+    ## read PVSMs
     for f in args.input:
         pvs.LoadState(f)
+
+        reprs= pvs.GetRepresentations() # dict of objects (entries in pipeline browser)
+        newreprs= [ repr for repr in reprs.values() if repr not in set(oldreprs)] # https://stackoverflow.com/questions/3462143/get-difference-between-two-lists#3462202
+        for repr in newreprs: # list of newly added objects
+            reppro.append(repr.ListProperties()) # dict of object properties
+            # GetProperty(repr, props[0]) # values of property
+
+        oldreprs = reprs # save current list, to exclude after next load of state file (as these will be reset)
+
+    ## use current dict of objects (after last LoadState)
+    for i, repr in enumerate(reprs.values()):
+        pvs.SetProperties(repr, reppro[i]);
 
 
     if args.output:
