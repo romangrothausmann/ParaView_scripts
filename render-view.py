@@ -32,6 +32,7 @@ def main():
     parser.add_argument("-oa", "--oriAxes", dest="oriAxes", default=False, action='store_true', required=False, help="Render the orientation axes.")
     parser.add_argument("-oao", "--oriAxesOnly", dest="oriAxesOnly", default=False, action='store_true', required=False, help="Render only the orientation axes.")
     parser.add_argument("-r", "--resetCam", dest="reset", default=False, action='store_true', required=False, help="Reset render camera (\"view-all\")")
+    parser.add_argument("-p", "--plugin", dest="plugin", metavar='FILE', required=False, help="Plug-In to load")
 
     args = parser.parse_args(argv)
 
@@ -52,6 +53,10 @@ def main():
 
     print pvs.GetParaViewSourceVersion() # should create a ProxyManager, still getting the warning: ProxyManager is not set. Can not perform operation: Begin()
 
+    ## load plugin if given
+    if args.plugin:
+        pvs.LoadPlugin(args.plugin, False, globals())
+    
     ## read pvsm
     pvs.LoadState(args.input)
 
