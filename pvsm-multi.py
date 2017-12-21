@@ -53,7 +53,7 @@ def main():
         for repr in newreprs: # list of newly added objects
             d = {}
             for props in repr.ListProperties():
-                d[props] = pvs.GetProperty(repr, props[0]) # values of property
+                d[props] = pvs.GetProperty(repr, props) # values of property
             reppro.append(d) # dict of object properties
 
         oldreprs = reprs # save current list, to exclude after next load of state file (as these will be reset)
