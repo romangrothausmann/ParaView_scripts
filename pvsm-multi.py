@@ -51,10 +51,14 @@ def main():
         reprs= pvs.GetRepresentations() # dict of objects (entries in pipeline browser)
         newreprs= [ repr for repr in reprs.values() if repr not in set(oldreprs)] # https://stackoverflow.com/questions/3462143/get-difference-between-two-lists#3462202
         for repr in newreprs: # list of newly added objects
+            print repr
             d = {}
             for props in repr.ListProperties():
                 d[props] = pvs.GetProperty(repr, props) # values of property
+                print props, d[props]
+                pvs.SetProperties(repr, **d) # test setting of properties collected so far
             reppro.append(d) # dict of object properties
+            
 
         oldreprs = reprs # save current list, to exclude after next load of state file (as these will be reset)
 
