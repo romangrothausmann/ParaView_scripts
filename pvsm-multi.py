@@ -54,9 +54,10 @@ def main():
             print repr
             d = {}
             for props in repr.ListProperties():
-                d[props] = pvs.GetProperty(repr, props) # values of property
-                print props, d[props]
-                pvs.SetProperties(repr, **d) # test setting of properties collected so far
+                if props == 'Visibility':
+                    d[props] = pvs.GetProperty(repr, props) # values of property
+                    print props, d[props]
+                    pvs.SetProperties(repr, **d) # test setting of properties collected so far
             reppro[repr] = d
             
 
