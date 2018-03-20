@@ -41,7 +41,7 @@ def main():
        sys.exit(1)
 
 
-    reppro= [] # list to store property-list for each object
+    reppro= {} # dict (in case of ordering changes) to store property-list for each object
     oldreprs= []
 
     ## read PVSMs
@@ -57,16 +57,15 @@ def main():
                 d[props] = pvs.GetProperty(repr, props) # values of property
                 print props, d[props]
                 pvs.SetProperties(repr, **d) # test setting of properties collected so far
-            reppro.append(d) # dict of object properties
+            reppro[repr] = d
             
 
         oldreprs = reprs # save current list, to exclude after next load of state file (as these will be reset)
 
     ## use current dict of objects (after last LoadState)
-    for i, repr in enumerate(reprs.values()):
-        print reppro[i]
-        pvs.SetProperties(repr, **reppro[i]);
-
+    for repr, prop in reppro.items():
+        print repr, prop
+        pvs.SetProperties(repr, **prop);
 
     if args.output:
         try:
