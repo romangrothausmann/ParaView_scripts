@@ -54,9 +54,11 @@ def main():
             print repr
             d = {}
             for props in repr.ListProperties():
-                d[props] = pvs.GetProperty(repr, props) # values of property
-                print props, d[props]
-                pvs.SetProperties(repr, **d) # test setting of properties collected so far
+                propv = pvs.GetProperty(repr, props) # values of property
+                if propv:
+                    d[props] = propv
+                    print props, d[props]
+                    pvs.SetProperties(repr, **d) # test setting of properties collected so far
             reppro[repr] = d
             
 
