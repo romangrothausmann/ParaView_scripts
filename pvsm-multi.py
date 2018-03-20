@@ -68,6 +68,10 @@ def main():
         print repr, prop
         pvs.SetProperties(repr, **prop);
 
+    rv= pvs.GetRenderView()
+    rv.ResetCamera()
+    pvs.Render()
+
     if args.output:
         try:
             f = open(args.output, 'w')
