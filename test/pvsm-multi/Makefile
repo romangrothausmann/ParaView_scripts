@@ -18,6 +18,6 @@ K:= $(foreach exec,$(EXECUTABLES),\
 all: pvsm-multi_test.pvsm
 
 
-pvsm-multi_test.pvsm : pvsm-multi_01.pvsm pvsm-multi_02.pvsm
+pvsm-multi_test.pvsm : pvsm-multi_02.pvsm pvsm-multi_01.pvsm
 %_test.pvsm :
 	$(VGLRUN) pvpython ../../pvsm-multi.py -i $^ -o $@
