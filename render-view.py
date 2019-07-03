@@ -94,7 +94,10 @@ def main():
 
     if args.reset:
         rv.ResetCamera()
-    rv.UseOffscreenRendering= 1 # needed for stable checksums???
+
+    if pvs.servermanager.vtkSMProxyManager.GetVersionMajor() <= 5 and pvs.servermanager.vtkSMProxyManager.GetVersionMinor() < 6: # hasattr not available for rv https://public.kitware.com/pipermail/paraview/2014-May/031174.html
+        rv.UseOffscreenRendering= 1 # deprecated with PV-5.6.0 # needed for stable checksums???
+
     rv.StillRender() # needed for StereoRender to take effect (at least for hq)!
 
     if args.png:
