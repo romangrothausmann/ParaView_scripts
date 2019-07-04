@@ -5,7 +5,86 @@
 
 import paraview.simple as pvs
 import os
+import re
 
+
+def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Forums/paraview/205684-scripting-trace-cameraview.html#post712100
+    # Read pvcc file
+    A = []
+    with open(pvccfile) as fileobject:
+        A = fileobject.read()
+    
+    B = ''.join(A)
+    C = B.replace('\n','')
+    
+    # CameraPosition
+    match_pos = re.findall('<Property name="CameraPosition"(.*)<Property name="CameraFocalPoint"',C)
+    
+    xpos = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_pos[0])
+    ypos = re.findall('<Element index="1" value="(.*)"/>(.*)<Element index="2"',match_pos[0])
+    zpos = re.findall('<Element index="2" value="(.*)"/>',match_pos[0])
+    xpos = float(xpos[0][0])
+    ypos = float(ypos[0][0])
+    zpos = float(zpos[0])
+    
+    # CameraFocalPoint
+    match_foc = re.findall('<Property name="CameraFocalPoint"(.*)<Property name="CameraViewUp"',C)
+    
+    xfoc = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_foc[0])
+    yfoc = re.findall('<Element index="1" value="(.*)"/>(.*)<Element index="2"',match_foc[0])
+    zfoc = re.findall('<Element index="2" value="(.*)"/>',match_foc[0])
+    xfoc = float(xfoc[0][0])
+    yfoc = float(yfoc[0][0])
+    zfoc = float(zfoc[0])
+    
+    # CameraViewUp
+    match_up = re.findall('<Property name="CameraViewUp"(.*)<Property name="CenterOfRotation"',C)
+    
+    xup = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_up[0])
+    yup = re.findall('<Element index="1" value="(.*)"/>(.*)<Element index="2"',match_up[0])
+    zup = re.findall('<Element index="2" value="(.*)"/>',match_up[0])
+    xup = float(xup[0][0])
+    yup = float(yup[0][0])
+    zup = float(zup[0])
+    
+    # CenterOfRotation
+    match_rot = re.findall('<Property name="CenterOfRotation"(.*)<Property name="RotationFactor"',C)
+    
+    xrot = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_rot[0])
+    yrot = re.findall('<Element index="1" value="(.*)"/>(.*)<Element index="2"',match_rot[0])
+    zrot = re.findall('<Element index="2" value="(.*)"/>',match_rot[0])
+    xrot = float(xrot[0][0])
+    yrot = float(yrot[0][0])
+    zrot = float(zrot[0])
+    
+    # RotationFactor
+    match_fac = re.findall('<Property name="RotationFactor"(.*)<Property name="CameraViewAngle"',C)
+    rotation_factor = re.findall('<Element index="0" value="(.*)"/>',match_fac[0])
+    rotation_factor = float(rotation_factor[0])
+    
+    # CameraViewAngle
+    match_ang = re.findall('<Property name="CameraViewAngle"(.*)<Property name="CameraParallelScale"',C)
+    camera_ang = re.findall('<Element index="0" value="(.*)"/>',match_ang[0])
+    camera_ang = float(camera_ang[0])
+    
+    # CameraParallelScale
+    match_sca = re.findall('<Property name="CameraParallelScale"(.*)<Property name="CameraParallelProjection"',C)
+    camera_sca = re.findall('<Element index="0" value="(.*)"/>',match_sca[0])
+    camera_sca = float(camera_sca[0])
+    
+    # CameraParallelProjection
+    match_prj = re.findall('<Property name="CameraParallelProjection"(.*)<Domain',C)
+    camera_proj = re.findall('<Element index="0" value="(.*)"/>',match_prj[0])
+    camera_proj = int(camera_proj[0])
+    
+    renderView1.CameraViewUp = [xup, yup, zup]
+    renderView1.CameraPosition = [xpos, ypos, zpos]
+    renderView1.CenterOfRotation = [xrot, yrot, zrot]
+    renderView1.RotationFactor = rotation_factor
+    renderView1.CameraViewAngle = camera_ang
+    renderView1.CameraParallelScale = camera_sca
+    renderView1.CameraParallelProjection = camera_proj
+    renderView1.CameraFocalPoint = [xfoc, yfoc, zfoc]
 
 def main():
     import sys       # to get command line args
@@ -33,6 +112,7 @@ def main():
     parser.add_argument("-oao", "--oriAxesOnly", dest="oriAxesOnly", default=False, action='store_true', required=False, help="Render only the orientation axes.")
     parser.add_argument("-r", "--resetCam", dest="reset", default=False, action='store_true', required=False, help="Reset render camera (\"view-all\")")
     parser.add_argument("-p", "--plugin", dest="plugin", metavar='FILE', required=False, help="Plug-In to load")
+    parser.add_argument("-c", "--camSettings", dest="pvcc", metavar='FILE', required=False, help="Cam settings from PVCC to load")
 
     args = parser.parse_args(argv)
 
@@ -94,6 +174,10 @@ def main():
 
     if args.reset:
         rv.ResetCamera()
+
+    ## load PVCC if given
+    if args.pvcc:
+        LoadCamSettings(args.pvcc, rv)
 
     if pvs.servermanager.vtkSMProxyManager.GetVersionMajor() <= 5 and pvs.servermanager.vtkSMProxyManager.GetVersionMinor() < 6: # hasattr not available for rv https://public.kitware.com/pipermail/paraview/2014-May/031174.html
         rv.UseOffscreenRendering= 1 # deprecated with PV-5.6.0 # needed for stable checksums???
