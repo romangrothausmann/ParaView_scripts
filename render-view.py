@@ -9,15 +9,13 @@ import re
 
 
 def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Forums/paraview/205684-scripting-trace-cameraview.html#post712100
-    # Read pvcc file
-    A = []
+    ## Read pvcc file
     with open(pvccfile) as fileobject:
         A = fileobject.read()
     
-    B = ''.join(A)
-    C = B.replace('\n','')
+    C = ''.join(A).replace('\n','')
     
-    # CameraPosition
+    ## CameraPosition
     match_pos = re.findall('<Property name="CameraPosition"(.*)<Property name="CameraFocalPoint"',C)
     
     xpos = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_pos[0])
@@ -27,7 +25,7 @@ def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Fo
     ypos = float(ypos[0][0])
     zpos = float(zpos[0])
     
-    # CameraFocalPoint
+    ## CameraFocalPoint
     match_foc = re.findall('<Property name="CameraFocalPoint"(.*)<Property name="CameraViewUp"',C)
     
     xfoc = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_foc[0])
@@ -37,7 +35,7 @@ def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Fo
     yfoc = float(yfoc[0][0])
     zfoc = float(zfoc[0])
     
-    # CameraViewUp
+    ## CameraViewUp
     match_up = re.findall('<Property name="CameraViewUp"(.*)<Property name="CenterOfRotation"',C)
     
     xup = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_up[0])
@@ -47,7 +45,7 @@ def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Fo
     yup = float(yup[0][0])
     zup = float(zup[0])
     
-    # CenterOfRotation
+    ## CenterOfRotation
     match_rot = re.findall('<Property name="CenterOfRotation"(.*)<Property name="RotationFactor"',C)
     
     xrot = re.findall('<Element index="0" value="(.*)"/>(.*)<Element index="1"',match_rot[0])
@@ -57,22 +55,22 @@ def LoadCamSettings(pvccfile, renderView1): # from https://www.cfd-online.com/Fo
     yrot = float(yrot[0][0])
     zrot = float(zrot[0])
     
-    # RotationFactor
+    ## RotationFactor
     match_fac = re.findall('<Property name="RotationFactor"(.*)<Property name="CameraViewAngle"',C)
     rotation_factor = re.findall('<Element index="0" value="(.*)"/>',match_fac[0])
     rotation_factor = float(rotation_factor[0])
     
-    # CameraViewAngle
+    ## CameraViewAngle
     match_ang = re.findall('<Property name="CameraViewAngle"(.*)<Property name="CameraParallelScale"',C)
     camera_ang = re.findall('<Element index="0" value="(.*)"/>',match_ang[0])
     camera_ang = float(camera_ang[0])
     
-    # CameraParallelScale
+    ## CameraParallelScale
     match_sca = re.findall('<Property name="CameraParallelScale"(.*)<Property name="CameraParallelProjection"',C)
     camera_sca = re.findall('<Element index="0" value="(.*)"/>',match_sca[0])
     camera_sca = float(camera_sca[0])
     
-    # CameraParallelProjection
+    ## CameraParallelProjection
     match_prj = re.findall('<Property name="CameraParallelProjection"(.*)<Domain',C)
     camera_proj = re.findall('<Element index="0" value="(.*)"/>',match_prj[0])
     camera_proj = int(camera_proj[0])
